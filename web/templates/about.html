@@ -1,0 +1,25 @@
+{{define "content"}}
+<h1>About</h1>
+<p>
+  Paragon is a cross-vendor AI runtime. The server mounts your model once on
+  GPU, then serves many forward passes concurrently by binding per-request
+  inputs/outputs to the same read-only weight buffers.
+</p>
+
+<ul class="bullets">
+  <li>
+    Resident model (weights + pipelines); requests only move input/output
+    tensors.
+  </li>
+  <li>
+    Client-side concurrency (many <code>/infer</code>) or server-side bursts
+    (<code>/blast</code>).
+  </li>
+  <li>Batching supported via <code>/infer-batch</code>.</li>
+</ul>
+
+<p>
+  Use the <a href="/test">Load Test</a> page to drive realistic traffic and see
+  latencies and percentiles.
+</p>
+{{end}}

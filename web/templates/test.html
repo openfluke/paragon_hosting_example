@@ -1,0 +1,229 @@
+{{define "content"}}
+<h1 class="title is-2">Load Test</h1>
+
+<div class="box">
+  <div class="columns is-multiline">
+    <div class="column is-3">
+      <div class="field">
+        <label class="label">Mode</label>
+        <div class="control">
+          <div class="select is-fullwidth">
+            <select id="mode">
+              <option value="client">Client-side: many /infer requests</option>
+              <option value="server">Server-side: one /blast request</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="column is-2">
+      <div class="field">
+        <label class="label">Requests (N)</label>
+        <div class="control">
+          <input
+            id="count"
+            class="input"
+            type="number"
+            min="1"
+            max="2000"
+            value="100"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="column is-2">
+      <div class="field">
+        <label class="label">Parallel (browser)</label>
+        <div class="control">
+          <input
+            id="parallel"
+            class="input"
+            type="number"
+            min="1"
+            max="256"
+            value="32"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="column is-2">
+      <div class="field">
+        <label class="label">Input</label>
+        <div class="control">
+          <div class="select is-fullwidth">
+            <select id="inputkind">
+              <option value="zeros">Zeros</option>
+              <option value="random">Random [0..1]</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="column is-3">
+      <div class="field">
+        <label class="label">&nbsp;</label>
+        <div class="buttons">
+          <button id="run" class="button is-primary">Run</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="field is-grouped is-grouped-multiline mt-3">
+    <div class="control">
+      <button id="startSess" class="button is-info is-light">
+        Start Session
+      </button>
+    </div>
+    <div class="control">
+      <button id="stopSess" class="button is-warning is-light" disabled>
+        Stop
+      </button>
+    </div>
+    <div class="control">
+      <button id="dlJSON" class="button is-light" disabled>
+        Download JSON
+      </button>
+    </div>
+    <div class="control">
+      <button id="dlCSV" class="button is-light" disabled>Download CSV</button>
+    </div>
+    <div class="control">
+      <button id="saveServer" class="button is-success is-light" disabled>
+        Save to Server
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="box">
+  <div class="columns is-vcentered">
+    <div class="column"><strong>GPU:</strong> <span id="gpu">…</span></div>
+    <div class="column"><strong>Model:</strong> <span id="model">…</span></div>
+    <div class="column"><strong>Input:</strong> <span id="dims">…</span></div>
+    <div class="column">
+      <strong>In-flight:</strong> <span id="inflight">0</span>
+    </div>
+    <div class="column has-text-right">
+      <strong>Status:</strong>
+      <span id="status" class="tag is-light">idle</span>
+    </div>
+  </div>
+</div>
+
+<div class="box">
+  <h3 class="title is-4">Metrics</h3>
+  <div class="columns">
+    <div class="column is-4">
+      <div class="columns is-multiline">
+        <div class="column is-6">
+          <div class="notification is-dark">
+            <p class="heading">P50</p>
+            <p class="title is-5"><span id="p50">—</span> ms</p>
+          </div>
+        </div>
+        <div class="column is-6">
+          <div class="notification is-dark">
+            <p class="heading">P90</p>
+            <p class="title is-5"><span id="p90">—</span> ms</p>
+          </div>
+        </div>
+        <div class="column is-6">
+          <div class="notification is-dark">
+            <p class="heading">P99</p>
+            <p class="title is-5"><span id="p99">—</span> ms</p>
+          </div>
+        </div>
+        <div class="column is-6">
+          <div class="notification is-dark">
+            <p class="heading">Mean</p>
+            <p class="title is-5"><span id="mean">—</span> ms</p>
+          </div>
+        </div>
+        <div class="column is-6">
+          <div class="notification is-dark">
+            <p class="heading">Max</p>
+            <p class="title is-5"><span id="max">—</span> ms</p>
+          </div>
+        </div>
+        <div class="column is-6">
+          <div class="notification is-dark">
+            <p class="heading">Total</p>
+            <p class="title is-5"><span id="total">—</span> ms</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="column is-8">
+      <canvas id="chart" width="700" height="300"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="box">
+  <h3 class="title is-4">Recent Results</h3>
+  <div class="columns">
+    <div class="column is-8">
+      <div class="table-container">
+        <table class="table is-fullwidth is-hoverable" id="tbl">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>mode</th>
+              <th>top</th>
+              <th>score</th>
+              <th>srv ms</th>
+              <th>queue ms</th>
+              <th>client ms</th>
+              <th>gpu?</th>
+              <th>when</th>
+              <th>probs</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="column is-4">
+      <h4 class="title is-5">Last Output Vector</h4>
+      <div class="field has-addons mb-3">
+        <div class="control">
+          <label class="button is-static">Show top-k</label>
+        </div>
+        <div class="control">
+          <input
+            id="topk"
+            class="input"
+            type="number"
+            min="1"
+            max="100"
+            value="10"
+            style="width: 80px"
+          />
+        </div>
+        <div class="control">
+          <button id="copyProbs" class="button is-light">Copy</button>
+        </div>
+      </div>
+      <pre id="probsPanel" style="height: 220px; overflow: auto"></pre>
+    </div>
+  </div>
+  <pre id="log" style="max-height: 200px; overflow: auto"></pre>
+</div>
+
+<!-- Modal for full probs -->
+<div id="modal" class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Output vector</p>
+      <button id="closeModal" class="delete" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      <pre id="modalContent" style="max-height: 400px; overflow: auto"></pre>
+    </section>
+  </div>
+</div>
+
+<script src="/static/test.js"></script>
+{{end}}

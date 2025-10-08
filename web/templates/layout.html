@@ -1,0 +1,169 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{{.Title}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css"
+    />
+    <style>
+      :root {
+        --custom-dark: #1a1d2e;
+        --custom-darker: #151823;
+      }
+      body {
+        background: var(--custom-darker);
+        min-height: 100vh;
+      }
+      .navbar {
+        background: var(--custom-dark);
+        border-bottom: 1px solid #2d3142;
+      }
+      .navbar-brand .navbar-item {
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.2rem;
+      }
+      .navbar-menu .navbar-item {
+        color: #ddd;
+      }
+      .navbar-menu .navbar-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+      }
+      .navbar-menu .navbar-item.is-cta {
+        background: #00d6b9;
+        color: #000;
+        border-radius: 6px;
+        margin-left: 0.5rem;
+        font-weight: 600;
+      }
+      .navbar-menu .navbar-item.is-cta:hover {
+        background: #00c4aa;
+      }
+      .hero {
+        background: linear-gradient(135deg, #1e2340 0%, #161929 100%);
+      }
+      .hero .title,
+      .hero .subtitle {
+        color: #fff;
+      }
+      .box {
+        background: var(--custom-dark);
+        border: 1px solid #2d3142;
+        color: #e8ecff;
+      }
+      .content,
+      .title,
+      .subtitle,
+      .label {
+        color: #e8ecff;
+      }
+      .footer {
+        background: var(--custom-dark);
+        border-top: 1px solid #2d3142;
+        color: #a6add7;
+      }
+      .input,
+      .select select,
+      .textarea {
+        background: #0e1130;
+        border-color: #2b2f59;
+        color: #e8ecff;
+      }
+      .input:focus,
+      .select select:focus {
+        border-color: #7aa2ff;
+        box-shadow: 0 0 0 0.125em rgba(122, 162, 255, 0.25);
+      }
+      .table {
+        background: transparent;
+        color: #e8ecff;
+      }
+      .table thead th {
+        color: #a6add7;
+        border-color: #2d3142;
+      }
+      .table tbody td {
+        border-color: #2d3142;
+      }
+      .table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.03);
+      }
+      pre {
+        background: #0a0d24;
+        border: 1px solid #202447;
+        color: #e8ecff;
+      }
+      .modal-card {
+        background: var(--custom-dark);
+      }
+      .modal-card-head,
+      .modal-card-foot {
+        background: var(--custom-darker);
+        border-color: #2d3142;
+      }
+      .modal-card-title {
+        color: #e8ecff;
+      }
+      canvas {
+        background: #0a0d24;
+        border: 1px solid #2d3142;
+        border-radius: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar" role="navigation">
+      <div class="container">
+        <div class="navbar-brand">
+          <a class="navbar-item" href="/"> Paragon Server </a>
+          <a role="button" class="navbar-burger" data-target="navMenu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </a>
+        </div>
+        <div id="navMenu" class="navbar-menu">
+          <div class="navbar-end">
+            <a class="navbar-item" href="/">Home</a>
+            <a class="navbar-item" href="/about">About</a>
+            <a class="navbar-item is-cta" href="/test">Load Test</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="section">
+      <div class="container">{{template "content" .}}</div>
+    </main>
+
+    <footer class="footer">
+      <div class="content has-text-centered">
+        <p>© {{now}} OpenFluke · Mounted-once, stream inputs.</p>
+      </div>
+    </footer>
+
+    <script>
+      // Bulma navbar burger
+      document.addEventListener("DOMContentLoaded", () => {
+        const $navbarBurgers = Array.prototype.slice.call(
+          document.querySelectorAll(".navbar-burger"),
+          0
+        );
+        $navbarBurgers.forEach((el) => {
+          el.addEventListener("click", () => {
+            const target = el.dataset.target;
+            const $target = document.getElementById(target);
+            el.classList.toggle("is-active");
+            $target.classList.toggle("is-active");
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
+{{end}}
